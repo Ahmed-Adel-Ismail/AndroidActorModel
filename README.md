@@ -44,7 +44,7 @@ For Any Service that will be used as an Actor, it should extend "ActorService" a
     public static final int MSG_PING = 1;
 
     public MainService() {
-        onMessageReceived(MSG_PING, replyPing()); // here we add the replyPing() function to be executed when the received Message.what is MSG_PING
+        onMessageReceived(MSG_PING, replyPing()); 			// here we add the replyPing() function to be executed when the received Message.what is MSG_PING
     }
 
     private Command<Message> replyPing() {
@@ -52,13 +52,13 @@ For Any Service that will be used as an Actor, it should extend "ActorService" a
         
             // this function will be trigerred when the incoming Message.what is MSG_PING
         
-            Message newMessage = MessageBuilder  // start building a new Message
-                    .prepareMessage(MainActivity.MSG_SHOW_TOAST) // set it's Message.what
-                    .serializable("Service Pinged") // add a Serializable as an extra to this Message
-                    .build(); // create the "android.os.Message" to be sent
+            Message newMessage = MessageBuilder  			// start building a new Message
+                    .prepareMessage(MainActivity.MSG_SHOW_TOAST) 	// set it's Message.what
+                    .serializable("Service Pinged") 			// add a Serializable as an extra to this Message
+                    .build(); 						// create the "android.os.Message" to be sent
                     
-            MessageReader messageReader = MessageReader.with(message); // read the incoming message in a MessageReader Object
-            messageReader.getReplyTo().send(newMessage); // we reply with this "newMessage" to the Actor who sent the MSG_PING Message
+            MessageReader messageReader = MessageReader.with(message); 	// read the incoming message in a MessageReader Object
+            messageReader.getReplyTo().send(newMessage); 		// we reply with this "newMessage" to the Actor who sent the MSG_PING Message
         };
     }
   }
@@ -82,13 +82,13 @@ also those Mailboxes need to be registered and unregistered to be active, also A
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ...
-        mailbox = new Mailbox(MainActivity.class, Looper.getMainLooper());  // create a Mailbox with the address MainActivity.class, and will run on the Main Looper
-        mailbox.addCommand(MSG_SHOW_TOAST, showToast()); // here we add the showToast() function to be executed when the received Message.what is MSG_SHOW_TOAST
+        mailbox = new Mailbox(MainActivity.class, Looper.getMainLooper());	// create a Mailbox with the address MainActivity.class, and will run on the Main Looper
+        mailbox.addCommand(MSG_SHOW_TOAST, showToast()); 			// here we add the showToast() function to be executed when the received Message.what is MSG_SHOW_TOAST
 
         MainApplication.getActorSystem()
                 .subscribe(actorSystem -> {
-                    actorSystem.register().actor(mailbox); // register the Mailbox of this Activity in the Actor System
-                    actorSystem.register().actor(MainService.class); // register the MainService to communicate with it, this calls bindService() internally
+                    actorSystem.register().actor(mailbox); 			// register the Mailbox of this Activity in the Actor System
+                    actorSystem.register().actor(MainService.class); 		// register the MainService to communicate with it, this calls bindService() internally
                 });
 
     }
@@ -103,18 +103,18 @@ also those Mailboxes need to be registered and unregistered to be active, also A
         super.onResume();
         MainApplication.getActorSystem()
                 .subscribe(actorSystem -> actorSystem.actorOf(MainService.class)
-                        .prepareMessage(MainService.MSG_PING)  // prepare a Message with MainService.MSG_PING in it's Message.what
-                        .replyTo(MainActivity.class) // tell the receiver that it can reply to the Actor's Mailbox with the address MainActivity.class
-                        .serializable("pinging") // add a Serializable extra to the message
-                        .send()); // send the message in a non-blocking manner
+                        .prepareMessage(MainService.MSG_PING) 	 		// prepare a Message with MainService.MSG_PING in it's Message.what
+                        .replyTo(MainActivity.class) 				// tell the receiver that it can reply to the Actor's Mailbox with the address MainActivity.class
+                        .serializable("pinging") 				// add a Serializable extra to the message
+                        .send());						// send the message in a non-blocking manner
     }
 
 
     @Override
     protected void onDestroy() {
         MainApplication.getActorSystem().subscribe(actorSystem -> {
-            actorSystem.unregister().actor(MainService.class);  // unregister the MainService.class Actor, this invokes the unbindService() method
-            actorSystem.unregister().actor(mailbox);  // unregister the Mailbox of this Activity
+            actorSystem.unregister().actor(MainService.class); 			// unregister the MainService.class Actor, this invokes the unbindService() method
+            actorSystem.unregister().actor(mailbox);  				// unregister the Mailbox of this Activity
         });
         super.onDestroy();
     }
